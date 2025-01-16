@@ -31,11 +31,10 @@ class LoginStudent(APIView):
             user = Students.objects.get(username=username)
             
             if check_password(password,user.password):
-                refresh_token = RefreshToken.for_user(user)
+                refresh_token = RefreshToken()
+                refresh_token["id"] = user.pk
+                refresh_token["username"] = user.username
                 access_token = refresh_token.access_token
-
-                access_token["id"] = user.id
-                access_token["username"] = user.username
 
                 return Response({
                     'access':str(access_token),
@@ -128,4 +127,20 @@ class UpdateUserView(APIView):
         response, status_code = self.update_user(request.user, request.data)
         return Response(response, status=status_code)
 
-    
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [CustomJWTAuthentication]
+
+    def post(self, request):
+        refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Đưa Refresh Token vào danh sách đen
+
+            return Response({'message': 'Đăng xuất thành công'}, status=status.HTTP_205_RESET_CONTENT)
+        except TokenError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
