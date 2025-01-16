@@ -38,8 +38,6 @@ class LoginStudent(APIView):
                 access_token["username"] = user.username
 
                 return Response({
-                    'id':user.id,
-                    'username':user.username,
                     'access':str(access_token),
                     'refresh':str(refresh_token)
                 })
@@ -54,12 +52,15 @@ class LoginStudent(APIView):
 class CustomJWTAuthentication(JWTAuthentication):
     def get_user(self, validated_token):
         try:
-            user_id = validated_token.get('user_id')
+            user_id = validated_token.get('id')
+            if not user_id:
+                raise InvalidToken("Token does not contain user ID")
+            
             user = Students.objects.get(id=user_id)
-
             return user
         except Students.DoesNotExist:
-            raise InvalidToken("User not found 2")
+            raise InvalidToken("User not found")
+
         
 
 class UserDetailView(APIView):
@@ -77,16 +78,20 @@ class TokenRefreshView(APIView):
 
     def post(self, request):
         refresh_token = request.data.get('refresh')
+        if not refresh_token:
+            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             token = RefreshToken(refresh_token)
             new_access_token = token.access_token
 
             return Response({
-                'access':str(new_access_token),
-                'refresh':str(token),
+                'access': str(new_access_token),
+                'refresh': str(token),
             })
         except TokenError as e:
-            return Response({'error':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         
 
 class UpdateUserView(APIView):
@@ -97,7 +102,8 @@ class UpdateUserView(APIView):
         serializer = StudentsSerializer(instance=user,data=data,partial=True)
 
         if not serializer.is_valid():
-            return serializer.errors, status.HTTP_400_BAD_REQUEST
+            return {'error': serializer.errors}, status.HTTP_400_BAD_REQUEST
+
         
         if 'username' in data:
             if Students.objects.filter(username=data['username']).exclude(pk=user.pk).exists():
@@ -107,9 +113,8 @@ class UpdateUserView(APIView):
             if Students.objects.filter(email=data['email']).exclude(pk=user.pk).exists():
                 return {'error': 'Email đã tồn tại'}, status.HTTP_400_BAD_REQUEST
             
-        if 'password' in data:
+        if 'password' in data and data['password']:
             data['password'] = make_password(data['password'])
-            serializer = StudentsSerializer(instance=user, data=data, partial=True)
 
         serializer.save()
         return serializer.data, status.HTTP_200_OK
@@ -122,3 +127,5 @@ class UpdateUserView(APIView):
     def patch(self, request):
         response, status_code = self.update_user(request.user, request.data)
         return Response(response, status=status_code)
+
+    
