@@ -5,4 +5,4 @@ class StudentsConfig(AppConfig):
     name = 'students'
 
     def ready(self):
-        import students.signals  # Import file signals.py
+        import students.signals

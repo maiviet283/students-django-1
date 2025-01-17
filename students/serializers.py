@@ -36,3 +36,9 @@ class StudentsSerializer(serializers.ModelSerializer):
         except serializers.ValidationError:
             raise serializers.ValidationError("Email không hợp lệ")
         return value
+    
+    def validate_phone_number(self, value):
+        if not re.match(r"^\d{10}$", value):
+            raise serializers.ValidationError("Số điện thoại phải có đúng 10 chữ số.")
+        return value
+

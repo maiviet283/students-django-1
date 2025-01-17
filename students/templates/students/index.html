@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    <title>Home</title>
+{% endblock title %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="mb-4 text-primary">Welcome to Students (API)</h1>
+        <p class="text-muted">Explore various endpoints to manage Students API effectively.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">API Endpoints</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="list-group">
+                        <a href="{% url 'students:register_user' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Register Students
+                            <span class="badge bg-primary rounded-pill">POST</span>
+                        </a>
+                        <a href="{% url 'students:login_user' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Login Student
+                            <span class="badge bg-success rounded-pill">POST</span>
+                        </a>
+                        <a href="{% url 'students:user_detail' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            User Detail View
+                            <span class="badge bg-info rounded-pill">GET</span>
+                        </a>
+                        <a href="{% url 'students:update_user' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Update User View
+                            <span class="badge bg-warning rounded-pill">PUT</span>
+                        </a>
+                        <a href="{% url 'students:refresh_token' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Token Refresh View
+                            <span class="badge bg-secondary rounded-pill">POST</span>
+                        </a>
+                        <a href="{% url 'students:logout_user' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Logout View
+                            <span class="badge bg-danger rounded-pill">POST</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">© 2025 Students API</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

@@ -29,5 +29,25 @@ class AdminClasses(admin.ModelAdmin):
     list_display = ['id','name','quantity']
     search_fields = ['id','name']
 
+
+class AdminBook(admin.ModelAdmin):
+    search_fields = ['id','name','price','quantity','author']
+    list_per_page = 5
+    list_display = ['id','name','author','quantity','price','image']
+    readonly_fields = ["image_static"]
+
+    def image_static(self, book):
+        if book.avata:
+            return mark_safe(f"<img src='{book.avata.url}' width='120px' style='border-radius: 5px;' />")
+        return "No Image"
+
+    def image(self, book):
+        if book.avata:
+            return mark_safe(f"<img src='{book.avata.url}' width='120px' style='border-radius: 5px;' />")
+        return "No Image"
+
+
+
 admin.site.register(Students,AdminStudents)
 admin.site.register(Classes, AdminClasses)
+admin.site.register(Book, AdminBook)

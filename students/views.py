@@ -8,6 +8,11 @@ from rest_framework_simplejwt.exceptions import InvalidToken,TokenError
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'students/index.html')
 
 
 class RegisterStudents(APIView):
@@ -103,7 +108,6 @@ class UpdateUserView(APIView):
         if not serializer.is_valid():
             return {'error': serializer.errors}, status.HTTP_400_BAD_REQUEST
 
-        
         if 'username' in data:
             if Students.objects.filter(username=data['username']).exclude(pk=user.pk).exists():
                 return {'error': 'Username đã tồn tại'}, status.HTTP_400_BAD_REQUEST
