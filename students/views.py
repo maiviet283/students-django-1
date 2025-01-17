@@ -139,8 +139,13 @@ class LogoutView(APIView):
 
         try:
             token = RefreshToken(refresh_token)
-            token.blacklist()  # Đưa Refresh Token vào danh sách đen
-
-            return Response({'message': 'Đăng xuất thành công'}, status=status.HTTP_205_RESET_CONTENT)
+            token.blacklist()
+            return Response({
+                'message': 'Đăng xuất thành công. Refresh token đã bị vô hiệu hóa.'
+            }, status=status.HTTP_205_RESET_CONTENT)
         except TokenError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Refresh token không hợp lệ hoặc đã hết hạn.',
+                'details': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+

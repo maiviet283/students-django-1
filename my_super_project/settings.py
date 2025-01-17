@@ -15,11 +15,12 @@ from datetime import timedelta
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=2),  # Thời gian sống của Access Token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),     # Thời gian sống của Refresh Token
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=5),     # Thời gian sống của Refresh Token
     'ROTATE_REFRESH_TOKENS': True,                 # Có tự động làm mới Refresh Token khi làm mới Access Token hay không
     'BLACKLIST_AFTER_ROTATION': True,               # Có vô hiệu hóa Refresh Token sau khi nó được làm mới hay không
     'UPDATE_LAST_LOGIN': False,                     # Có cập nhật thời gian đăng nhập cuối cùng của user hay không
 }
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
