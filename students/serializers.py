@@ -6,7 +6,7 @@ import re
 class StudentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Students
-        fields = ['id','avata', 'name', 'age', 'sex', 'classes', 'phone_number','email', 'address', 'username']
+        fields = ['id', 'avata', 'name', 'age', 'sex', 'classes', 'phone_number', 'email', 'address', 'username','password']
 
     def validate_name(self, value):
         if not re.match(r"^[\w\s]*$", value):
@@ -36,9 +36,13 @@ class StudentsSerializer(serializers.ModelSerializer):
         except serializers.ValidationError:
             raise serializers.ValidationError("Email không hợp lệ")
         return value
-    
+
     def validate_phone_number(self, value):
         if not re.match(r"^\d{10}$", value):
             raise serializers.ValidationError("Số điện thoại phải có đúng 10 chữ số.")
         return value
 
+    def validate_age(self, value):
+        if value < 6 or value > 120:
+            raise serializers.ValidationError("Tuổi phải nằm trong khoảng từ 6 đến 120.")
+        return value

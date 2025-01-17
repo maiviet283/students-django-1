@@ -18,12 +18,17 @@ def index(request):
 class RegisterStudents(APIView):
     permission_classes = [AllowAny]    
 
-    def post(self,request):
-        serializers = StudentsSerializer(data=request.data)
-        if serializers.is_valid():
-            serializers.save(password=make_password(request.data.get('password')))
-            return Response(serializers.data, status=status.HTTP_201_CREATED)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request):
+        serializer = StudentsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(password=make_password(request.data.get('password')))
+            # Lấy dữ liệu sau khi lưu và xóa các trường không cần thiết
+            data = serializer.data
+            data = {key: value for key, value in data.items() if key in ['username', 'password']}
+
+            return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class LoginStudent(APIView):
     permission_classes = [AllowAny]
@@ -74,7 +79,13 @@ class UserDetailView(APIView):
     def get(self, request):
         user = request.user
         serializer = StudentsSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Xóa trường 'age' trước khi trả về response
+        data = serializer.data
+        #data.pop('username', None)
+
+        return Response(data, status=status.HTTP_200_OK)
+
     
 
 class TokenRefreshView(APIView):
