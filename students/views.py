@@ -22,11 +22,15 @@ class RegisterStudents(APIView):
         serializer = StudentsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(password=make_password(request.data.get('password')))
-            # Lấy dữ liệu sau khi lưu và xóa các trường không cần thiết
+
             data = serializer.data
             data = {key: value for key, value in data.items() if key in ['username', 'password']}
 
-            return Response(data, status=status.HTTP_201_CREATED)
+            return Response({
+                "message":"Đăng Ký Tài Khoản Students Thành Công",
+                "data":data
+            }, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
@@ -52,10 +56,14 @@ class LoginStudent(APIView):
                 })
             
             else: 
-                return Response({'error':'Tên đăng nhập hoặc mật khẩu không đúng'},status=status.HTTP_400_BAD_REQUEST)
+                return Response({
+                    'error':'Tên đăng nhập hoặc mật khẩu không đúng'
+                },status=status.HTTP_400_BAD_REQUEST)
             
         except Students.DoesNotExist:
-            return Response({'error':'Tên đăng nhập hoặc mật khẩu không đúng'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                'error':'Tên đăng nhập hoặc mật khẩu không đúng'
+            }, status=status.HTTP_401_UNAUTHORIZED)
 
 
 class CustomJWTAuthentication(JWTAuthentication):
@@ -63,12 +71,12 @@ class CustomJWTAuthentication(JWTAuthentication):
         try:
             user_id = validated_token.get('id')
             if not user_id:
-                raise InvalidToken("Token does not contain user ID")
+                raise InvalidToken("Token Thông Báo Không có ID trên")
             
             user = Students.objects.get(id=user_id)
             return user
         except Students.DoesNotExist:
-            raise InvalidToken("User not found")
+            raise InvalidToken("User Không Tồn Tại")
 
         
 
@@ -80,11 +88,13 @@ class UserDetailView(APIView):
         user = request.user
         serializer = StudentsSerializer(user)
 
-        # Xóa trường 'age' trước khi trả về response
         data = serializer.data
-        #data.pop('username', None)
+        data.pop('password', None)
 
-        return Response(data, status=status.HTTP_200_OK)
+        return Response({
+            "message":"Lấy Thông Tin Students Thành Công",
+            "data":data
+        }, status=status.HTTP_200_OK)
 
     
 
@@ -94,7 +104,9 @@ class TokenRefreshView(APIView):
     def post(self, request):
         refresh_token = request.data.get('refresh')
         if not refresh_token:
-            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Cần có Mã Refresh Token'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             token = RefreshToken(refresh_token)
@@ -105,7 +117,9 @@ class TokenRefreshView(APIView):
                 'refresh': str(token),
             })
         except TokenError as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         
 
@@ -150,7 +164,9 @@ class LogoutView(APIView):
     def post(self, request):
         refresh_token = request.data.get('refresh')
         if not refresh_token:
-            return Response({'error': 'Refresh token is required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': 'Cần có Mã Refresh Token'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             token = RefreshToken(refresh_token)
@@ -158,6 +174,7 @@ class LogoutView(APIView):
             return Response({
                 'message': 'Đăng xuất thành công. Refresh token đã bị vô hiệu hóa.'
             }, status=status.HTTP_205_RESET_CONTENT)
+
         except TokenError as e:
             return Response({
                 'error': 'Refresh token không hợp lệ hoặc đã hết hạn.',
