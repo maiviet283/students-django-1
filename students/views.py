@@ -16,21 +16,16 @@ def index(request):
 
 
 class RegisterStudents(APIView):
-    permission_classes = [AllowAny]    
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = StudentsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(password=make_password(request.data.get('password')))
-
-            data = serializer.data
-            data = {key: value for key, value in data.items() if key in ['username', 'password']}
-
+            serializer.save()
             return Response({
-                "message":"Đăng Ký Tài Khoản Students Thành Công",
-                "data":data
+                "message": "Đăng Ký Tài Khoản Students Thành Công",
+                "data": {"username": serializer.data.get("username")},
             }, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
@@ -66,6 +61,7 @@ class LoginStudent(APIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
 
+
 class CustomJWTAuthentication(JWTAuthentication):
     def get_user(self, validated_token):
         try:
@@ -85,18 +81,12 @@ class UserDetailView(APIView):
     authentication_classes = [CustomJWTAuthentication]
 
     def get(self, request):
-        user = request.user
-        serializer = StudentsSerializer(user)
-
-        data = serializer.data
-        data.pop('password', None)
-
+        serializer = StudentsSerializer(request.user)
         return Response({
-            "message":"Lấy Thông Tin Students Thành Công",
-            "data":data
+            "message": "Lấy Thông Tin Students Thành Công",
+            "data": serializer.data
         }, status=status.HTTP_200_OK)
 
-    
 
 class TokenRefreshView(APIView):
     permission_classes = [AllowAny]

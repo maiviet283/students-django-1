@@ -34,7 +34,7 @@ SECRET_KEY = 'django-insecure-65=3=b9oa#hi0-&j)9@71n3ty@a(w9#-0utmpt=&r8-c&7)=k^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [

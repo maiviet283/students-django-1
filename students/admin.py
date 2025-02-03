@@ -4,9 +4,9 @@ from django.utils.html import mark_safe
 # Register your models here.
 
 class AdminStudents(admin.ModelAdmin):
-    search_fields = ['id','name','age','address','username','email','classes__name','phone_number','sex']
-    list_display = ['id','name','age','username','get_class_name','image']
-    list_filter = ['classes__name']
+    search_fields = ['id', 'full_name', 'date_of_birth', 'address', 'username', 'email', 'student_class__name', 'phone_number', 'gender']
+    list_display = ['id', 'full_name', 'date_of_birth', 'username', 'get_class_name', 'image']
+    list_filter = ['student_class__name']  # Đổi 'classes__name' -> 'student_class__name'
     list_per_page = 5
     readonly_fields = ["image_static"]
 
@@ -26,14 +26,14 @@ class AdminStudents(admin.ModelAdmin):
 
 
 class AdminClasses(admin.ModelAdmin):
-    list_display = ['id','name','quantity']
+    list_display = ['id', 'name', 'current_students']  # Đổi 'quantity' -> 'current_students'
     search_fields = ['id','name']
 
 
 class AdminBook(admin.ModelAdmin):
-    search_fields = ['id','name','price','quantity','author']
+    search_fields = ['id', 'title', 'price', 'quantity', 'author']  # Đổi 'name' -> 'title'
+    list_display = ['id', 'title', 'author', 'quantity', 'price', 'image']  # Đổi 'name' -> 'title'
     list_per_page = 5
-    list_display = ['id','name','author','quantity','price','image']
     readonly_fields = ["image_static"]
 
     def image_static(self, book):
